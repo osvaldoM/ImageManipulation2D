@@ -2,6 +2,9 @@
  * use this code on your free will
  * OsvaldoM
  * life is meant to be lived
+
+
+ *CLASSE com o painel que se transforma
  */
 
 /**
@@ -18,22 +21,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-public class AffineTransformTest {
+public class TransformImage {
 
-//	private static TransformingCanvas canvas;
-//	public static void main(String[] args) {
-//		JFrame frame = new JFrame();
-//		canvas = new TransformingCanvas();
-//		TranslateHandler translater = new TranslateHandler(canvas);
-//		canvas.addMouseListener(translater);
-//		canvas.addMouseMotionListener(translater);
-//		canvas.addMouseWheelListener(new ScaleHandler());
-//		frame.setLayout(new BorderLayout());
-//		frame.getContentPane().add(canvas, BorderLayout.CENTER);
-//		frame.setSize(500, 500);
-//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		frame.setVisible(true);
-//	}
     public static class TransformingCanvas extends JComponent {
 
         private double translateX;
@@ -41,6 +30,8 @@ public class AffineTransformTest {
         private double scale;
         private double rotate;
         boolean crop;
+        Rectangle rectangle;
+        BufferedImage image;
 
         TransformingCanvas() {
             translateX = 0;
@@ -48,14 +39,16 @@ public class AffineTransformTest {
             rotate = 0;
             scale = 1;
             crop = false;
-
+            rectangle= new Rectangle(0,0,30,30);
             setOpaque(true);
             setDoubleBuffered(true);
         }
 
         @Override
         public void paint(Graphics g) {
-            BufferedImage image = loadImage("eu.jpg");
+            if(image==null){
+             image = loadImage("kid.jpg");
+            }
             AffineTransform tx = new AffineTransform();
             tx.translate(translateX, translateY);
             tx.scale(scale, scale);
@@ -75,7 +68,8 @@ public class AffineTransformTest {
                 ourGraphics.drawImage(image, tx, null);
                 System.out.println("first run");
             } else {
-                BufferedImage croped = cropImage(image, new Rectangle(0, 0, 500, 600));
+                BufferedImage croped = cropImage(image,rectangle);
+                image=croped;
                 ourGraphics.drawImage(croped, tx, null);
                 crop=false;
                 System.out.println("not first run");
@@ -86,7 +80,7 @@ public class AffineTransformTest {
         private BufferedImage loadImage(String fileName) {
             BufferedImage img = null;
             try {
-                img = ImageIO.read(this.getClass().getResource("kid.jpg"));
+                img = ImageIO.read(this.getClass().getResource(fileName));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
@@ -161,6 +155,11 @@ public class AffineTransformTest {
             }
             else if(e.getSource()==Main.cropBT){
                 canvas.crop=true;
+                int x=  Integer.parseInt(Main.x.getText());
+                int y=  Integer.parseInt(Main.y.getText());
+                int a=  Integer.parseInt(Main.a.getText());
+                int b=  Integer.parseInt(Main.b.getText());
+                canvas.rectangle= new Rectangle(x,y,a,b);
                 // schedule a repaint.
                 canvas.repaint();
             }
