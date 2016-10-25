@@ -17,13 +17,13 @@ import javax.swing.JTextField;
  */
 public class Main extends JPanel {
 
-    JPanel optionsPanel,rotatePanel,valuesPanel,cropPanel;
+    JPanel optionsPanel,rotatePanel,valuesPanel,cropPanel,shearPanel,scalePanel,translatePanel;
     JComboBox transformsCB, renderCB;
     String[] transformsOptions;
     String[] renderOptions;
     JButton identity = new JButton("set to identity");
-    public static JTextField rotationValue,x,y,a,b;
-    public static JButton rotateRight,rotateLeft,cropBT;
+    public static JTextField rotationValue,x,y,a,b,shearValueX,shearValueY,scaleValueX,scaleValueY,translateValueX,translateValueY;
+    public static JButton rotateRight,rotateLeft,cropBT,shearBT,translateBT,scaleBT;
 
     public Main() {
         build();
@@ -34,7 +34,7 @@ public class Main extends JPanel {
         canvas = new TransformImage.TransformingCanvas();
         TransformImage.TranslateHandler translater = new TransformImage.TranslateHandler(canvas);
         BorderLayout bLayout = new BorderLayout(5, 20);
-        optionsPanel = new JPanel(new GridLayout(1, 7,20,6));
+        optionsPanel = new JPanel(new GridLayout(2, 7,20,6));
         rotatePanel= new JPanel();
         cropPanel= new JPanel();
         valuesPanel= new JPanel(new GridLayout(2,2));
@@ -51,6 +51,43 @@ public class Main extends JPanel {
         cropPanel.add(valuesPanel);
         cropPanel.add(cropBT);
         
+        shearValueX = new JTextField(3);
+        shearValueY = new JTextField(3);
+        shearBT = new JButton("Shear");
+        shearBT.addMouseListener(translater);
+        shearPanel = new JPanel();
+        shearPanel.add(new JLabel("shear values"));
+        shearPanel.add(shearValueX);
+        shearPanel.add(new JLabel("X"));
+        shearPanel.add(shearValueY);
+        shearPanel.add(new JLabel("Y"));
+        shearPanel.add(shearBT);
+        
+        scaleValueX = new JTextField(3);
+        scaleValueY = new JTextField(3);
+        scaleBT = new JButton("Scale");
+        scaleBT.addMouseListener(translater);
+        scalePanel = new JPanel();
+        scalePanel.add(new JLabel("scale values"));
+        scalePanel.add(scaleValueX);
+        scalePanel.add(new JLabel("X"));
+        scalePanel.add(scaleValueY);
+        scalePanel.add(new JLabel("Y"));
+        scalePanel.add(scaleBT);
+        
+        translateValueX = new JTextField(3);
+        translateValueY = new JTextField(3);
+        translateBT = new JButton("Translate");
+        translateBT.addMouseListener(translater);
+        translatePanel = new JPanel();
+        translatePanel.add(new JLabel("translate values"));
+        translatePanel.add(translateValueX);
+        translatePanel.add(new JLabel("X"));
+        translatePanel.add(translateValueY);
+        translatePanel.add(new JLabel("Y"));
+        translatePanel.add(translateBT);
+        
+        
         transformsOptions = new String[]{"rotate", "scale", "shear", "identity"};
         renderOptions = new String[]{"stroke", "fill"};
         transformsCB = new JComboBox(transformsOptions);
@@ -66,7 +103,10 @@ public class Main extends JPanel {
         rotatePanel.add(new JLabel("rotation value"));
         rotatePanel.add(rotationValue);
 
-        //optionsPanel.add(transformsCB);
+        //optionsPanel.add(transformsCB);   
+        optionsPanel.add(scalePanel);
+        optionsPanel.add(translatePanel);
+        optionsPanel.add(shearPanel);
         optionsPanel.add(renderCB);
         optionsPanel.add(identity);
         optionsPanel.add(cropPanel);

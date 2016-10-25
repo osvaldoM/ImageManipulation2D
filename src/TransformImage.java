@@ -27,7 +27,7 @@ public class TransformImage {
 
         private double translateX;
         private double translateY;
-        private double scale;
+        private double scaleX,scaleY,shearX,shearY;
         private double rotate;
         boolean crop;
         Rectangle rectangle;
@@ -37,7 +37,10 @@ public class TransformImage {
             translateX = 0;
             translateY = 0;
             rotate = 0;
-            scale = 1;
+            scaleX = 1;
+            scaleY = 1;
+            shearX = 0;
+            shearY = 0;
             crop = false;
             rectangle= new Rectangle(0,0,30,30);
             setOpaque(true);
@@ -51,8 +54,9 @@ public class TransformImage {
             }
             AffineTransform tx = new AffineTransform();
             tx.translate(translateX, translateY);
-            tx.scale(scale, scale);
+            tx.scale(scaleX, scaleY);
             tx.rotate(Math.toRadians(rotate), this.getWidth() / 2, this.getHeight() / 2);
+            tx.shear(shearX, shearY);
 
             Graphics2D ourGraphics = (Graphics2D) g;
             ourGraphics.setColor(Color.WHITE);
@@ -143,7 +147,7 @@ public class TransformImage {
                 // schedule a repaint.
                 canvas.repaint();
             }
-            else if (e.getSource() == Main.rotateLeft) {
+            if (e.getSource() == Main.rotateLeft) {
                 try {
                     int value = Integer.parseInt(Main.rotationValue.getText());
                     canvas.rotate = canvas.rotate - value;
@@ -153,7 +157,7 @@ public class TransformImage {
                 // schedule a repaint.
                 canvas.repaint();
             }
-            else if(e.getSource()==Main.cropBT){
+            if(e.getSource()==Main.cropBT){
                 canvas.crop=true;
                 int x=  Integer.parseInt(Main.x.getText());
                 int y=  Integer.parseInt(Main.y.getText());
@@ -161,6 +165,54 @@ public class TransformImage {
                 int b=  Integer.parseInt(Main.b.getText());
                 canvas.rectangle= new Rectangle(x,y,a,b);
                 // schedule a repaint.
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.scaleBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.scaleValueX.getText());
+                    Double valueY = Double.parseDouble(Main.scaleValueY.getText());
+                    canvas.scaleX+=valueX;
+                    canvas.scaleY+=valueY;
+                }catch(Exception ex){
+                    canvas.scaleX+=0.5;
+                    canvas.scaleY+=0.5;
+                }
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.shearBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.shearValueX.getText());
+                    Double valueY = Double.parseDouble(Main.shearValueY.getText());
+                    canvas.shearX+=valueX;
+                    canvas.shearY+=valueY;
+                }catch(Exception ex){
+                    canvas.shearX+=0.5;
+                    canvas.shearY+=0.5;
+                }
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.translateBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.translateValueX.getText());
+                    Double valueY = Double.parseDouble(Main.translateValueY.getText());
+                    canvas.translateX+=valueX;
+                    canvas.translateY+=valueY;
+                }catch(Exception ex){
+                    canvas.translateX+=0.5;
+                    canvas.translateY+=0.5;
+                }
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.shearBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.shearValueX.getText());
+                    Double valueY = Double.parseDouble(Main.shearValueY.getText());
+                    canvas.shearX+=valueX;
+                    canvas.shearY+=valueY;
+                }catch(Exception ex){
+                    canvas.shearX+=0.5;
+                    canvas.shearY+=0.5;
+                }
                 canvas.repaint();
             }
         }
@@ -195,10 +247,10 @@ public class TransformImage {
 
                 // make it a reasonable amount of zoom
                 // .1 gives a nice slow transition
-                canvas.scale += (.1 * e.getWheelRotation());
+                canvas.scaleY=canvas.scaleX += (.1 * e.getWheelRotation());
                 // don't cross negative threshold.
-                // also, setting scale to 0 has bad effects
-                canvas.scale = Math.max(0.00001, canvas.scale);
+                // also, setting scaleX to 0 has bad effects
+                canvas.scaleY=canvas.scaleX = Math.max(0.00001, canvas.scaleX);
                 canvas.repaint();
             }
         }
