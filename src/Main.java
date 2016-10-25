@@ -21,7 +21,7 @@ public class Main extends JPanel {
     JComboBox transformsCB, renderCB;
     String[] transformsOptions;
     String[] renderOptions;
-    JButton identity = new JButton("set to identity");
+    public static JButton identity = new JButton("set to identity");
     public static JTextField rotationValue,x,y,a,b,shearValueX,shearValueY,scaleValueX,scaleValueY,translateValueX,translateValueY;
     public static JButton rotateRight,rotateLeft,cropBT,shearBT,translateBT,scaleBT;
 
@@ -34,6 +34,7 @@ public class Main extends JPanel {
         canvas = new TransformImage.TransformingCanvas();
         TransformImage.TranslateHandler translater = new TransformImage.TranslateHandler(canvas);
         BorderLayout bLayout = new BorderLayout(5, 20);
+        identity.addMouseListener(translater);
         optionsPanel = new JPanel(new GridLayout(2, 7,20,6));
         rotatePanel= new JPanel();
         cropPanel= new JPanel();

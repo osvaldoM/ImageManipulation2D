@@ -32,6 +32,7 @@ public class TransformImage {
         boolean crop;
         Rectangle rectangle;
         BufferedImage image;
+        AffineTransform tx = new AffineTransform();
 
         TransformingCanvas() {
             translateX = 0;
@@ -210,10 +211,17 @@ public class TransformImage {
                     canvas.shearX+=valueX;
                     canvas.shearY+=valueY;
                 }catch(Exception ex){
-                    canvas.shearX+=0.5;
-                    canvas.shearY+=0.5;
+                    canvas.shearX+=1;
+                    canvas.shearY+=1;
                 }
                 canvas.repaint();
+                
+            }
+            if(e.getSource()==Main.identity){
+                canvas.tx.setToIdentity();
+                canvas.tx.scale(100, 1);
+                canvas.repaint();
+                System.out.println("im here");
             }
         }
 
