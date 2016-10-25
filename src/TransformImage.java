@@ -15,11 +15,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import javax.imageio.ImageIO;
-
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class TransformImage {
 
@@ -32,6 +35,7 @@ public class TransformImage {
         boolean crop;
         Rectangle rectangle;
         BufferedImage image;
+        String path="";
         AffineTransform tx = new AffineTransform();
 
         TransformingCanvas() {
@@ -42,6 +46,7 @@ public class TransformImage {
             scaleY = 1;
             shearX = 0;
             shearY = 0;
+            
             crop = false;
             rectangle= new Rectangle(0,0,30,30);
             setOpaque(true);
@@ -50,8 +55,10 @@ public class TransformImage {
 
         @Override
         public void paint(Graphics g) {
-            if(image==null){
+            if(path.equals("")){
              image = loadImage("kid.jpg");
+            }else{
+            image = loadImage(path);
             }
             AffineTransform tx = new AffineTransform();
             tx.translate(translateX, translateY);
@@ -85,7 +92,7 @@ public class TransformImage {
         private BufferedImage loadImage(String fileName) {
             BufferedImage img = null;
             try {
-                img = ImageIO.read(this.getClass().getResource(fileName));
+                img = ImageIO.read(new File(fileName));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
@@ -223,6 +230,23 @@ public class TransformImage {
                 canvas.repaint();
                 System.out.println("im here");
             }
+            if(e.getSource()==Main.openFile){
+                JFileChooser fileChooser = new JFileChooser();
+FileNameExtensionFilter extFilter = new FileNameExtensionFilter(
+        "Image File", "jpg", "png");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+    // Set the file filter
+    fileChooser.addChoosableFileFilter(extFilter);
+
+    int returnValue = fileChooser.showOpenDialog(null);
+
+    if (returnValue == JFileChooser.APPROVE_OPTION) {
+      File selectedFile = fileChooser.getSelectedFile();
+      canvas.path=selectedFile.toString();
+    }
+    canvas.repaint();
+            }
+            
         }
 
         public void mouseEntered(MouseEvent e) {

@@ -23,7 +23,7 @@ public class Main extends JPanel {
     String[] renderOptions;
     public static JButton identity = new JButton("set to identity");
     public static JTextField rotationValue,x,y,a,b,shearValueX,shearValueY,scaleValueX,scaleValueY,translateValueX,translateValueY;
-    public static JButton rotateRight,rotateLeft,cropBT,shearBT,translateBT,scaleBT;
+    public static JButton rotateRight,rotateLeft,cropBT,shearBT,translateBT,scaleBT,openFile;
 
     public Main() {
         build();
@@ -51,6 +51,9 @@ public class Main extends JPanel {
         valuesPanel.add(b);
         cropPanel.add(valuesPanel);
         cropPanel.add(cropBT);
+        
+        openFile = new JButton("Open File");
+        openFile.addMouseListener(translater);
         
         shearValueX = new JTextField(3);
         shearValueY = new JTextField(3);
@@ -104,7 +107,8 @@ public class Main extends JPanel {
         rotatePanel.add(new JLabel("rotation value"));
         rotatePanel.add(rotationValue);
 
-        //optionsPanel.add(transformsCB);   
+        //optionsPanel.add(transformsCB);  
+        optionsPanel.add(openFile);
         optionsPanel.add(scalePanel);
         optionsPanel.add(translatePanel);
         optionsPanel.add(shearPanel);
