@@ -30,13 +30,13 @@ public class TransformImage {
 
         private double translateX;
         private double translateY;
-        private double scaleX,scaleY,shearX,shearY;
+        private double scaleX, scaleY, shearX, shearY;
         private double rotate;
-        boolean crop,setIdentity;
+        boolean crop, setIdentity,grayScale;
         Rectangle rectangle;
         BufferedImage image;
-        String path="";
-        AffineTransform tx = new AffineTransform();
+        String path = "";
+        // AffineTransform tx = new AffineTransform();
 
         TransformingCanvas() {
             translateX = 0;
@@ -46,26 +46,30 @@ public class TransformImage {
             scaleY = 1;
             shearX = 0;
             shearY = 0;
-            
+            grayScale=false;
             crop = false;
-            rectangle= new Rectangle(0,0,30,30);
+            rectangle = new Rectangle(0, 0, 30, 30);
             setOpaque(true);
             setDoubleBuffered(true);
         }
 
         @Override
         public void paint(Graphics g) {
-            if(path.equals("")){
-             image = loadImage("kid.jpg");
-            }else{
-            image = loadImage(path);
+            if (path.equals("")) {
+                image = loadImage("kid.jpg");
+            } else {
+                image = loadImage(path);
             }
             AffineTransform tx = new AffineTransform();
             tx.translate(translateX, translateY);
             tx.scale(scaleX, scaleY);
             tx.rotate(Math.toRadians(rotate), this.getWidth() / 2, this.getHeight() / 2);
             tx.shear(shearX, shearY);
-
+            
+            if(grayScale){
+                grayScale();
+                grayScale=false;
+            }
             Graphics2D ourGraphics = (Graphics2D) g;
             ourGraphics.setColor(Color.WHITE);
             ourGraphics.fillRect(0, 0, getWidth(), getHeight());
@@ -76,24 +80,32 @@ public class TransformImage {
                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             ourGraphics.setColor(Color.BLACK);
             ourGraphics.drawString("Imagem a transformar", 50, 30);
-            if (!crop) {
+            if (!crop && !setIdentity) {
                 ourGraphics.drawImage(image, tx, null);
                 System.out.println("first run");
             }
-//            else if(setIdentity==true){
-//                System.out.println("identity"+setIdentity);
-//               tx.setToIdentity();
-//               tx.translate(getWidth()/2, getHeight()/2);
-//               ourGraphics.drawImage(image, tx, null);
-//               setIdentity=false;
-//            }
-            else {
-                BufferedImage croped = cropImage(image,rectangle);
-                image=croped;
+            if (setIdentity == true) {
+                tx.setToIdentity();
+                //tx.scale(100, 1);
+                // tx.rotate();
+                tx.translate(getWidth() / 2, getHeight() / 2);
+                ourGraphics.drawImage(image, tx, null);
+                setIdentity = false;
+            } else {
+                BufferedImage croped = cropImage(image, rectangle);
+                image = croped;
                 ourGraphics.drawImage(croped, tx, null);
-                crop=false;
+                crop = false;
+
+                try {
+                    File outputfile = new File("croped.png");
+                    ImageIO.write(croped, "png", outputfile);
+                } catch (IOException e) {
+
+                }
                 System.out.println("not first run");
             }
+
             // super.paint(g);
         }
 
@@ -113,6 +125,26 @@ public class TransformImage {
             Graphics g = copyOfImage.createGraphics();
             g.drawImage(image, 0, 0, null);
             return copyOfImage;
+        }
+        
+        public void grayScale(){
+            int width = image.getWidth();
+            int height = image.getHeight();
+            for(int i=0; i<height; i++){
+         
+            for(int j=0; j<width; j++){
+            
+               Color c = new Color(image.getRGB(j, i));
+               int red = (int)(c.getRed() * 0.299);
+               int green = (int)(c.getGreen() * 0.587);
+               int blue = (int)(c.getBlue() *0.114);
+               Color newColor = new Color(red+green+blue,
+               
+               red+green+blue,red+green+blue);
+               
+               image.setRGB(j,i,newColor.getRGB());
+            }
+         }
         }
     }
 
@@ -173,94 +205,87 @@ public class TransformImage {
                 // schedule a repaint.
                 canvas.repaint();
             }
-            if(e.getSource()==Main.cropBT){
-                canvas.crop=true;
-                int x=  Integer.parseInt(Main.x.getText());
-                int y=  Integer.parseInt(Main.y.getText());
-                int a=  Integer.parseInt(Main.a.getText());
-                int b=  Integer.parseInt(Main.b.getText());
-                canvas.rectangle= new Rectangle(x,y,a,b);
+            if (e.getSource() == Main.cropBT) {
+                canvas.crop = true;
+                int x = Integer.parseInt(Main.x.getText());
+                int y = Integer.parseInt(Main.y.getText());
+                int a = Integer.parseInt(Main.a.getText());
+                int b = Integer.parseInt(Main.b.getText());
+                canvas.rectangle = new Rectangle(x, y, a, b);
                 // schedule a repaint.
                 canvas.repaint();
             }
-//            else if(e.getSource()==Main.identity){
-//                System.out.println("identity clickd");
-//                canvas.setIdentity=true;
-//                // schedule a repaint.
-//                canvas.repaint();
-//            }
-    if(e.getSource()==Main.scaleBT){
-                try{
+
+            if (e.getSource() == Main.scaleBT) {
+                if (!Main.scaleValueX.getText().equals("")) {
                     Double valueX = Double.parseDouble(Main.scaleValueX.getText());
+                    canvas.scaleX += valueX;
+                }
+                if (!Main.scaleValueY.getText().equals("")) {
                     Double valueY = Double.parseDouble(Main.scaleValueY.getText());
-                    canvas.scaleX+=valueX;
-                    canvas.scaleY+=valueY;
-                }catch(Exception ex){
-                    canvas.scaleX+=0.5;
-                    canvas.scaleY+=0.5;
+                    canvas.scaleY += valueY;
                 }
+
                 canvas.repaint();
             }
-            if(e.getSource()==Main.shearBT){
-                try{
+            if (e.getSource() == Main.shearBT) {
+                try {
                     Double valueX = Double.parseDouble(Main.shearValueX.getText());
                     Double valueY = Double.parseDouble(Main.shearValueY.getText());
-                    canvas.shearX+=valueX;
-                    canvas.shearY+=valueY;
-                }catch(Exception ex){
-                    canvas.shearX+=0.5;
-                    canvas.shearY+=0.5;
+                    canvas.shearX += valueX;
+                    canvas.shearY += valueY;
+                } catch (Exception ex) {
+                    canvas.shearX += 0.5;
+                    canvas.shearY += 0.5;
                 }
                 canvas.repaint();
             }
-            if(e.getSource()==Main.translateBT){
-                try{
+            if (e.getSource() == Main.translateBT) {
+                if (!Main.translateValueX.getText().equals("")) {
                     Double valueX = Double.parseDouble(Main.translateValueX.getText());
-                    Double valueY = Double.parseDouble(Main.translateValueY.getText());
-                    canvas.translateX+=valueX;
-                    canvas.translateY+=valueY;
-                }catch(Exception ex){
-                    canvas.translateX+=0.5;
-                    canvas.translateY+=0.5;
+                    canvas.translateX += valueX;
                 }
+                if (!Main.translateValueY.getText().equals("")) {
+                    Double valueY = Double.parseDouble(Main.translateValueY.getText());
+                    canvas.translateY += valueY;
+                }
+
                 canvas.repaint();
             }
-            if(e.getSource()==Main.shearBT){
-                try{
+            if (e.getSource() == Main.shearBT) {
+                try {
                     Double valueX = Double.parseDouble(Main.shearValueX.getText());
                     Double valueY = Double.parseDouble(Main.shearValueY.getText());
-                    canvas.shearX+=valueX;
-                    canvas.shearY+=valueY;
-                }catch(Exception ex){
-                    canvas.shearX+=1;
-                    canvas.shearY+=1;
+                    canvas.shearX += valueX;
+                    canvas.shearY += valueY;
+                } catch (Exception ex) {
+                    canvas.shearX += 1;
+                    canvas.shearY += 1;
                 }
                 canvas.repaint();
-                
+
             }
-            if(e.getSource()==Main.identity){
-                canvas.tx.setToIdentity();
-                canvas.tx.scale(100, 1);
+            if (e.getSource() == Main.identity) {
+                canvas.setIdentity = true;
                 canvas.repaint();
-                System.out.println("im here");
             }
-            if(e.getSource()==Main.openFile){
+            if (e.getSource() == Main.openFile) {
                 JFileChooser fileChooser = new JFileChooser();
-FileNameExtensionFilter extFilter = new FileNameExtensionFilter(
-        "Image File", "jpg", "png");
-        fileChooser.setAcceptAllFileFilterUsed(false);
-    // Set the file filter
-    fileChooser.addChoosableFileFilter(extFilter);
+                FileNameExtensionFilter extFilter = new FileNameExtensionFilter(
+                        "Image File", "jpg", "png");
+                fileChooser.setAcceptAllFileFilterUsed(false);
+                // Set the file filter
+                fileChooser.addChoosableFileFilter(extFilter);
 
-    int returnValue = fileChooser.showOpenDialog(null);
+                int returnValue = fileChooser.showOpenDialog(null);
 
-    if (returnValue == JFileChooser.APPROVE_OPTION) {
-      File selectedFile = fileChooser.getSelectedFile();
-      canvas.path=selectedFile.toString();
-    }
-    canvas.repaint();
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    canvas.path = selectedFile.toString();
+                }
+                canvas.repaint();
             }
-            
+
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -293,13 +318,28 @@ FileNameExtensionFilter extFilter = new FileNameExtensionFilter(
 
                 // make it a reasonable amount of zoom
                 // .1 gives a nice slow transition
-                canvas.scaleY=canvas.scaleX += (.1 * e.getWheelRotation());
+                canvas.scaleY = canvas.scaleX += (.1 * e.getWheelRotation());
                 // don't cross negative threshold.
                 // also, setting scaleX to 0 has bad effects
-                canvas.scaleY=canvas.scaleX = Math.max(0.00001, canvas.scaleX);
+                canvas.scaleY = canvas.scaleX = Math.max(0.00001, canvas.scaleX);
                 canvas.repaint();
             }
         }
+    }
+    
+    public static class itemHandler implements ItemListener{
+        TransformingCanvas canvas;
+        
+        public itemHandler(TransformingCanvas tc) {
+            this.canvas = tc;
+        }
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          canvas.grayScale=true;
+            System.out.println("changed");
+          canvas.repaint();
+        }
+        
     }
 
 }
