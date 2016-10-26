@@ -29,7 +29,7 @@ public class TransformImage {
         private double translateY;
         private double scale;
         private double rotate;
-        boolean crop;
+        boolean crop,setIdentity;
         Rectangle rectangle;
         BufferedImage image;
 
@@ -67,7 +67,15 @@ public class TransformImage {
             if (!crop) {
                 ourGraphics.drawImage(image, tx, null);
                 System.out.println("first run");
-            } else {
+            }
+//            else if(setIdentity==true){
+//                System.out.println("identity"+setIdentity);
+//               tx.setToIdentity();
+//               tx.translate(getWidth()/2, getHeight()/2);
+//               ourGraphics.drawImage(image, tx, null);
+//               setIdentity=false;
+//            }
+            else {
                 BufferedImage croped = cropImage(image,rectangle);
                 image=croped;
                 ourGraphics.drawImage(croped, tx, null);
@@ -163,6 +171,12 @@ public class TransformImage {
                 // schedule a repaint.
                 canvas.repaint();
             }
+//            else if(e.getSource()==Main.identity){
+//                System.out.println("identity clickd");
+//                canvas.setIdentity=true;
+//                // schedule a repaint.
+//                canvas.repaint();
+//            }
         }
 
         public void mouseEntered(MouseEvent e) {

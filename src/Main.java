@@ -21,7 +21,7 @@ public class Main extends JPanel {
     JComboBox transformsCB, renderCB;
     String[] transformsOptions;
     String[] renderOptions;
-    public static JButton identity = new JButton("set to identity");
+    JButton identity = new JButton("set to identity");
     public static JTextField rotationValue,x,y,a,b;
     public static JButton rotateRight,rotateLeft,cropBT;
 
@@ -40,7 +40,6 @@ public class Main extends JPanel {
         valuesPanel= new JPanel(new GridLayout(2,2));
         cropBT=new JButton("crop");
         cropBT.addMouseListener(translater);
-        identity.addMouseListener(translater);
         x= new JTextField(2);
         y= new JTextField(2);
         a= new JTextField(2);
