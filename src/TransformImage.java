@@ -15,11 +15,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import javax.imageio.ImageIO;
-
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class TransformImage {
 
@@ -27,17 +30,23 @@ public class TransformImage {
 
         private double translateX;
         private double translateY;
-        private double scale;
+        private double scaleX,scaleY,shearX,shearY;
         private double rotate;
         boolean crop,setIdentity;
         Rectangle rectangle;
         BufferedImage image;
+        String path="";
+        AffineTransform tx = new AffineTransform();
 
         TransformingCanvas() {
             translateX = 0;
             translateY = 0;
             rotate = 0;
-            scale = 1;
+            scaleX = 1;
+            scaleY = 1;
+            shearX = 0;
+            shearY = 0;
+            
             crop = false;
             rectangle= new Rectangle(0,0,30,30);
             setOpaque(true);
@@ -46,13 +55,16 @@ public class TransformImage {
 
         @Override
         public void paint(Graphics g) {
-            if(image==null){
+            if(path.equals("")){
              image = loadImage("kid.jpg");
+            }else{
+            image = loadImage(path);
             }
             AffineTransform tx = new AffineTransform();
             tx.translate(translateX, translateY);
-            tx.scale(scale, scale);
+            tx.scale(scaleX, scaleY);
             tx.rotate(Math.toRadians(rotate), this.getWidth() / 2, this.getHeight() / 2);
+            tx.shear(shearX, shearY);
 
             Graphics2D ourGraphics = (Graphics2D) g;
             ourGraphics.setColor(Color.WHITE);
@@ -88,7 +100,7 @@ public class TransformImage {
         private BufferedImage loadImage(String fileName) {
             BufferedImage img = null;
             try {
-                img = ImageIO.read(this.getClass().getResource(fileName));
+                img = ImageIO.read(new File(fileName));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
@@ -151,7 +163,7 @@ public class TransformImage {
                 // schedule a repaint.
                 canvas.repaint();
             }
-            else if (e.getSource() == Main.rotateLeft) {
+            if (e.getSource() == Main.rotateLeft) {
                 try {
                     int value = Integer.parseInt(Main.rotationValue.getText());
                     canvas.rotate = canvas.rotate - value;
@@ -161,7 +173,7 @@ public class TransformImage {
                 // schedule a repaint.
                 canvas.repaint();
             }
-            else if(e.getSource()==Main.cropBT){
+            if(e.getSource()==Main.cropBT){
                 canvas.crop=true;
                 int x=  Integer.parseInt(Main.x.getText());
                 int y=  Integer.parseInt(Main.y.getText());
@@ -177,6 +189,78 @@ public class TransformImage {
 //                // schedule a repaint.
 //                canvas.repaint();
 //            }
+    if(e.getSource()==Main.scaleBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.scaleValueX.getText());
+                    Double valueY = Double.parseDouble(Main.scaleValueY.getText());
+                    canvas.scaleX+=valueX;
+                    canvas.scaleY+=valueY;
+                }catch(Exception ex){
+                    canvas.scaleX+=0.5;
+                    canvas.scaleY+=0.5;
+                }
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.shearBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.shearValueX.getText());
+                    Double valueY = Double.parseDouble(Main.shearValueY.getText());
+                    canvas.shearX+=valueX;
+                    canvas.shearY+=valueY;
+                }catch(Exception ex){
+                    canvas.shearX+=0.5;
+                    canvas.shearY+=0.5;
+                }
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.translateBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.translateValueX.getText());
+                    Double valueY = Double.parseDouble(Main.translateValueY.getText());
+                    canvas.translateX+=valueX;
+                    canvas.translateY+=valueY;
+                }catch(Exception ex){
+                    canvas.translateX+=0.5;
+                    canvas.translateY+=0.5;
+                }
+                canvas.repaint();
+            }
+            if(e.getSource()==Main.shearBT){
+                try{
+                    Double valueX = Double.parseDouble(Main.shearValueX.getText());
+                    Double valueY = Double.parseDouble(Main.shearValueY.getText());
+                    canvas.shearX+=valueX;
+                    canvas.shearY+=valueY;
+                }catch(Exception ex){
+                    canvas.shearX+=1;
+                    canvas.shearY+=1;
+                }
+                canvas.repaint();
+                
+            }
+            if(e.getSource()==Main.identity){
+                canvas.tx.setToIdentity();
+                canvas.tx.scale(100, 1);
+                canvas.repaint();
+                System.out.println("im here");
+            }
+            if(e.getSource()==Main.openFile){
+                JFileChooser fileChooser = new JFileChooser();
+FileNameExtensionFilter extFilter = new FileNameExtensionFilter(
+        "Image File", "jpg", "png");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+    // Set the file filter
+    fileChooser.addChoosableFileFilter(extFilter);
+
+    int returnValue = fileChooser.showOpenDialog(null);
+
+    if (returnValue == JFileChooser.APPROVE_OPTION) {
+      File selectedFile = fileChooser.getSelectedFile();
+      canvas.path=selectedFile.toString();
+    }
+    canvas.repaint();
+            }
+            
         }
 
         public void mouseEntered(MouseEvent e) {
@@ -209,10 +293,10 @@ public class TransformImage {
 
                 // make it a reasonable amount of zoom
                 // .1 gives a nice slow transition
-                canvas.scale += (.1 * e.getWheelRotation());
+                canvas.scaleY=canvas.scaleX += (.1 * e.getWheelRotation());
                 // don't cross negative threshold.
-                // also, setting scale to 0 has bad effects
-                canvas.scale = Math.max(0.00001, canvas.scale);
+                // also, setting scaleX to 0 has bad effects
+                canvas.scaleY=canvas.scaleX = Math.max(0.00001, canvas.scaleX);
                 canvas.repaint();
             }
         }

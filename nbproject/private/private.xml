@@ -3,9 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/Users/OsvaldoMaria/Documents/NetBeansProjects/ImageManipulationJava2D/src/Main.java</file>
             <file>file:/C:/Users/OsvaldoMaria/Documents/NetBeansProjects/ImageManipulationJava2D/src/Test.java</file>
             <file>file:/C:/Users/OsvaldoMaria/Documents/NetBeansProjects/ImageManipulationJava2D/src/TransformImage.java</file>
+=======
+            <file>file:/D:/Facul/Semestre%20VIII/Opcao%20II/ImageManipulation2D/src/TransformImage.java</file>
+            <file>file:/D:/Facul/Semestre%20VIII/Opcao%20II/ImageManipulation2D/src/Test.java</file>
+>>>>>>> 179888b1c067b98ca399f3a112da6da97c772fb6
         </group>
     </open-files>
 </project-private>
